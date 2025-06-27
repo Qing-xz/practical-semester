@@ -114,27 +114,7 @@ strong_pairs = sorted_pairs[abs(sorted_pairs) > 0.5]
 print("\n强相关特征对（相关系数绝对值>0.5）：")
 print(strong_pairs[strong_pairs.index.get_level_values(0) != strong_pairs.index.get_level_values(1)])
 
-# 5. 流行度与其他属性的关系
-print("\n5. 流行度与其他属性的关系：")
-# 计算流行度与其他属性的相关性
-numeric_columns = df.select_dtypes(include=['int64', 'float64']).columns.tolist()
-popularity_corr = df[numeric_columns].corrwith(df['popularity']).sort_values(ascending=False)
-print("流行度与其他属性的相关性：")
-print(popularity_corr)
-
-# 可视化流行度与舞蹈性、能量的关系
-plt.figure(figsize=(15, 5))
-plt.subplot(1, 2, 1)
-sns.scatterplot(x='danceability', y='popularity', data=df)
-plt.title('舞蹈性与流行度的关系')
-
-plt.subplot(1, 2, 2)
-sns.scatterplot(x='energy', y='popularity', data=df)
-plt.title('能量与流行度的关系')
-plt.tight_layout()
-plt.show()
-
-# 6. 时间趋势分析
+# 5. 时间趋势分析
 print("\n6. 时间趋势分析：")
 # 分析每年歌曲数量变化
 yearly_counts = df['release_date'].value_counts().sort_index()
