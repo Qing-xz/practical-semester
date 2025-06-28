@@ -1,9 +1,11 @@
 import pandas as pd
 import seaborn as sns
-from matplotlib import pyplot as plt
+import os
+# 设置环境变量，限制 OpenMP 线程数为 3
+os.environ['OMP_NUM_THREADS'] = '3'
 from sklearn.cluster import KMeans
+from matplotlib import pyplot as plt
 from sklearn.preprocessing import StandardScaler
-
 # 设置中文字体支持
 plt.rcParams["font.family"] = ["SimHei"]
 plt.rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
@@ -152,3 +154,84 @@ print(f"\n基于流派分布和特征相似性，选择聚类数 k = {k}")
 '''K-Means聚类'''
 kmeans = KMeans(n_clusters=k, random_state=42)
 df['cluster_label'] = kmeans.fit_predict(X_scaled)
+
+'''聚类结果分析'''
+# 1. 聚类内音乐特征分析
+print("\n各聚类音乐特征均值：")
+cluster_features = df.groupby('cluster_label')[music_features].mean()
+print(cluster_features)
+
+# 可视化聚类特征均值
+plt.figure(figsize=(16, 8))
+for i, feature in enumerate(music_features):
+    plt.subplot(3, 3, i+1)
+    sns.barplot(x=df['cluster_label'], y=df[feature], palette='viridis')
+    plt.title(f'聚类 vs {feature}')
+plt.tight_layout()
+plt.savefig('cluster_features.png')
+plt.show()
+
+# 2. 聚类与音乐流派的关系
+print("\n各聚类中流派分布（前5）：")
+genre_distribution = df.groupby(['cluster_label', 'artist_top_genre'])['name'].count().unstack(fill_value=0)
+print(genre_distribution)
+
+# 可视化流派分布
+plt.figure(figsize=(18, 10))
+sns.heatmap(genre_distribution, annot=True, fmt='g', cmap='YlGnBu')
+plt.title('各聚类中流派分布热图')
+plt.tight_layout()
+plt.savefig('genre_cluster_heatmap.png')
+plt.show()
+
+# 3. 聚类与歌曲流行度的关系
+print("\n各聚类平均流行度：")
+popularity_by_cluster = df.groupby('cluster_label')['popularity'].mean()
+print(popularity_by_cluster)
+
+# 可视化流行度分布
+plt.figure(figsize=(10, 6))
+sns.barplot(x=popularity_by_cluster.index, y=popularity_by_cluster.values, palette='magma')
+plt.title('各聚类平均流行度')
+plt.xlabel('聚类标签')
+plt.ylabel('平均流行度')
+plt.tight_layout()
+plt.savefig('popularity_by_cluster.png')
+plt.show()
+
+# 4. 聚类与发布时间的关系
+print("\n各聚类歌曲发布年份分布：")
+# 转换为年份
+df['release_year'] = df['release_date'].astype(str).str[:4].astype(int)
+year_by_cluster = df.groupby(['cluster_label', 'release_year'])['name'].count().unstack(fill_value=0)
+print(year_by_cluster)
+
+# 可视化发布时间分布
+plt.figure(figsize=(18, 10))
+for cluster in range(k):
+    cluster_data = year_by_cluster.loc[cluster].sort_index()
+    plt.plot(cluster_data.index, cluster_data.values, label=f'聚类 {cluster}')
+plt.title('各聚类歌曲发布年份分布')
+plt.xlabel('年份')
+plt.ylabel('歌曲数量')
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.savefig('release_year_by_cluster.png')
+plt.show()
+
+'''聚类结果总结'''
+print("\n聚类结果总结：")
+for cluster in range(k):
+    cluster_df = df[df['cluster_label'] == cluster]
+    main_genre = cluster_df['artist_top_genre'].value_counts().idxmax()
+    avg_popularity = cluster_df['popularity'].mean()
+    avg_danceability = cluster_df['danceability'].mean()
+    avg_energy = cluster_df['energy'].mean()
+    print(f"聚类 {cluster}:")
+    print(f"  主要流派: {main_genre}")
+    print(f"  平均流行度: {avg_popularity:.2f}")
+    print(f"  平均可舞性: {avg_danceability:.2f}")
+    print(f"  平均活力: {avg_energy:.2f}")
+    print(f"  歌曲数量: {len(cluster_df)}")
+    print()
