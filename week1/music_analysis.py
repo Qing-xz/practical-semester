@@ -1,6 +1,8 @@
 import pandas as pd
 import seaborn as sns
 from matplotlib import pyplot as plt
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
 
 # 设置中文字体支持
 plt.rcParams["font.family"] = ["SimHei"]
@@ -92,9 +94,7 @@ plt.show()
 print("\n4. 音乐属性相关性分析：")
 # 选择数值型音乐属性列
 music_features = ['danceability', 'acousticness', 'energy', 'instrumentalness',
-                  'liveness', 'loudness', 'speechiness',
-                  'tempo', 'time_signature']
-
+                  'liveness', 'loudness', 'speechiness', 'tempo', 'time_signature']
 # 计算相关系数矩阵
 correlation = df[music_features].corr()
 print("音乐属性相关系数矩阵：")
@@ -138,3 +138,17 @@ plt.xlabel('年份')
 plt.ylabel('平均流行度')
 plt.tight_layout()
 plt.show()
+
+'''确定聚类数量'''
+# 数据标准化
+X = df[music_features]
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# 根据流派大致分类为节奏型、抒情型、说唱型、综合型，选择k=4
+k = 4
+print(f"\n基于流派分布和特征相似性，选择聚类数 k = {k}")
+
+'''K-Means聚类'''
+kmeans = KMeans(n_clusters=k, random_state=42)
+df['cluster_label'] = kmeans.fit_predict(X_scaled)
