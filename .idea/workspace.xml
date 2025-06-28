@@ -5,11 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0bfdf975-7dfd-4809-abeb-03f720369e11" name="更改" comment="">
-      <change beforePath="$PROJECT_DIR$/week1/cluster_features.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/week1/genre_cluster_heatmap.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/week1/music_analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/week1/music_analysis.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/week1/popularity_by_cluster.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/week1/release_year_by_cluster.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
