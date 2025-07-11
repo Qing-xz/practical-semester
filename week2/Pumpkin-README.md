@@ -31,7 +31,7 @@ US-pumpkins数据集共有 1757 行，26 列。
 | Unnamed: 24 | 0 | float64 | 未命名字段 24 |
 | Unnamed: 25 | 103 | object | 未命名字段 25 |
 
-## 数据预处理
+## 数据处理阶段
 1. 缺失值处理
 
 该数据集存在缺失值，为了分析的准确性，对数据集进行缺失值处理：
@@ -47,22 +47,28 @@ US-pumpkins数据集共有 1757 行，26 列。
 转换完成后，提取了年份和月份信息分别存储在新的列 Year 和 Month 中，
 并统计了不同年份和不同月份的记录数。
 
+3. 对分类字段进行编码
+为了方便后续绘制特征热力图以及建模，
+将数据集除了 Date 字段外的所有分类字段转换为类别类型，并对其进行编码，将类别值转换为数值代码
+
 预处理后字段概述如下：
 
-| 字段名 | 数据类型 | 含义 |
-| --- | --- | --- |
-| City Name | object | 城市名称，记录南瓜交易或相关事件发生的城市 |
-| Package | object | 包装方式 |
-| Variety | object | 南瓜品种 |
-| Date | datetime64[ns] | 交易日期 |
-| Low Price | float64 | 最低价格 |
-| High Price | float64 | 最高价格 |
-| Mostly Low | float64 | 多数情况下的最低价格 |
-| Mostly High | float64 | 多数情况下的最高价格 |
-| Origin | object | 产地 | 
-| Item Size | object | 南瓜大小 |
-| Color | object | 颜色 |
-| Repack | object | 是否重新包装 |
+| 字段名 | 数据类型 | 含义                    |
+| --- | --- |-----------------------|
+| City Name | int8 | 城市名称，记录南瓜交易或相关事件发生的城市 |
+| Package | int8 | 包装方式                  |
+| Variety | int8 | 南瓜品种                  |
+| Date | datetime64[ns] | 交易日期                  |
+| Low Price | float64 | 最低价格                  |
+| High Price | float64 | 最高价格                  |
+| Mostly Low | float64 | 多数情况下的最低价格            |
+| Mostly High | float64 | 多数情况下的最高价格            |
+| Origin | int8 | 产地                    | 
+| Item Size | int8 | 南瓜大小                  |
+| Color | int8 | 颜色                    |
+| Repack | int8 | 是否重新包装                |
+| Year    |int32| 交易年份                  |
+| Month   |int32| 交易月份                  |
 
 ## 数据统计分析
 计算平均价格：通过数据集的 Low Price 字段和 High Price 字段计算 Average Price。
