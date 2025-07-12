@@ -11,7 +11,7 @@ df = pd.read_csv('US-pumpkins.csv')
 print(f"数据加载成功，共{df.shape[0]}行{df.shape[1]}列")
 print(df.info())
 
-'''0.数据处理阶段'''
+'''数据处理阶段'''
 # 1. 缺失值处理
 # 删除非空字段数量低于总数量50%的字段
 threshold = len(df) * 0.5
@@ -49,11 +49,15 @@ categorical_columns = categorical_columns.drop('Date', errors='ignore')
 for col in categorical_columns:
     df[col] = df[col].astype('category').cat.codes
 
+# 4. 计算平均价格，作为后续建模的目标变量
+df['Average Price'] = (df['Low Price'] + df['High Price']) / 2
+
 # 将结果保存为csv文件
-# csv_path = 'US-pumpkins_preprocessed.csv'
-# df.to_csv(csv_path)
+csv_path = 'US-pumpkins_preprocessed.csv'
+df.to_csv(csv_path)
 print(df.info())
 
+'''数据分析阶段'''
 
 
 
