@@ -53,36 +53,27 @@ for col in categorical_columns:
 df['Average Price'] = (df['Low Price'] + df['High Price']) / 2
 
 # 将结果保存为csv文件
-csv_path = 'US-pumpkins_preprocessed.csv'
-df.to_csv(csv_path)
+# csv_path = 'US-pumpkins_preprocessed.csv'
+# df.to_csv(csv_path)
 print(df.info())
 
 '''数据分析阶段'''
+selected_columns = ['Year', 'Month', 'City Name', 'Variety', 'Item Size', 'Average Price']
+model_df = df[selected_columns]
+
+# 查看筛选后数据的基本信息
+print('用于建模的数据基本信息：')
+model_df.info()
+
+# 查看各特征与平均价格的相关性（保留两位小数）
+correlation = model_df.corr()['Average Price'].drop('Average Price').round(2)
+print('各特征与平均价格的相关性：')
+print(correlation)
 
 
 
 
 
-#
-# '''分析'''
-# # 计算平均价格
-# df['Average Price'] = (df['Low Price'] + df['High Price']) / 2
-#
-# # 价格相关分析
-# print('价格统计信息：')
-# print(df['Average Price'].describe())
-#
-# print('主要城市数量：', df['City Name'].nunique())
-# print('主要品种数量：', df['Variety'].nunique())
-#
-# top_10_prices = df.nlargest(10, 'Average Price')
-# print('价格最高的前10个记录：')
-# print(top_10_prices)
-#
-# bottom_10_prices = df.nsmallest(10, 'Average Price')
-# print('价格最低的前10个记录：')
-# print(bottom_10_prices)
-#
 # '''可视化'''
 # # Matplotlib绘图部分
 # # 绘制主要城市南瓜价格分布
