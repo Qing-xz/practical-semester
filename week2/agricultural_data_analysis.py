@@ -1,6 +1,9 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.model_selection import train_test_split
+import xgboost as xgb
+from sklearn.metrics import mean_squared_error, r2_score
 
 # 设置中文显示
 plt.rcParams["font.family"] = ["SimHei"]
@@ -70,7 +73,28 @@ correlation = model_df.corr()['Average Price'].drop('Average Price').round(2)
 print('各特征与平均价格的相关性：')
 print(correlation)
 
+'''数据建模阶段'''
+# 划分特征和目标变量
+X = model_df.drop('Average Price', axis=1)
+y = model_df['Average Price']
 
+# 划分训练集和测试集，80%的数据用于训练，20%用于测试
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 选择 XGBoost 模型
+model = xgb.XGBRegressor(random_state=42)
+
+# 训练模型
+model.fit(X_train, y_train)
+
+# 在测试集上进行预测
+y_pred = model.predict(X_test)
+
+# 评估模型
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+print(f"均方误差 (MSE): {mse}")
+print(f"决定系数 (R²): {r2}")
 
 
 
