@@ -75,8 +75,15 @@ US-pumpkins数据集共有 1757 行，26 列。
 | Average Price | float64 |平均价格|
 
 ## 数据分析阶段
-选择Year、Month、City Name、Variety、Item Size和Average Price这些列用于建模。
-交易年月可能会体现季节方面的影响；交易城市可能体现城市物价方面的影响；品种和大小则是体现南瓜本身属性方面的影响。
+使用 Seaborn 绘制特征相关性矩阵，识别变量间线性关系
+![correlation_heatmap](correlation_heatmap.png)
+特征重要性排序：通过随机森林算法评估特征重要性，筛选 Top 10 关键特征
+![feature_importance](feature_importance.png)
+
+选择的特征: ['Package', 'Variety', 'City Name', 'Item Size', 'Origin', 'Month', 'Color', 'Year', 'Repack']
+
+## 模型拟合阶段
+
 
 ## 数据可视化分析
 ### 1. 价格与城市的关系

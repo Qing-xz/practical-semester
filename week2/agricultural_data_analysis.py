@@ -58,17 +58,51 @@ df['Average Price'] = (df['Low Price'] + df['High Price']) / 2
 print(df.info())
 
 '''数据分析阶段'''
-selected_columns = ['Year', 'Month', 'City Name', 'Variety', 'Item Size', 'Average Price']
-model_df = df[selected_columns]
+# 1. 计算特征相关性热力图
+plt.figure(figsize=(14, 10))
+correlation_matrix = df.corr()
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt='.2f')
+plt.title('特征相关性热力图')
+plt.tight_layout()
+plt.savefig('correlation_heatmap.png')
+plt.show()
 
-# 查看筛选后数据的基本信息
-print('用于建模的数据基本信息：')
-model_df.info()
+# 2. 特征重要性分析
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import train_test_split
 
-# 查看各特征与平均价格的相关性（保留两位小数）
-correlation = model_df.corr()['Average Price'].drop('Average Price').round(2)
-print('各特征与平均价格的相关性：')
-print(correlation)
+# 定义特征和目标变量
+X = df.drop(['Average Price', 'Date','Low Price','High Price','Mostly Low','Mostly High'], axis=1)  # 移除目标变量和日期
+y = df['Average Price']
+
+# 划分训练集和测试集
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 使用随机森林评估特征重要性
+rf = RandomForestRegressor(n_estimators=100, random_state=42)
+rf.fit(X_train, y_train)
+
+# 获取特征重要性
+feature_importance = pd.DataFrame({
+    'Feature': X.columns,
+    'Importance': rf.feature_importances_
+}).sort_values('Importance', ascending=False)
+
+# 可视化特征重要性
+plt.figure(figsize=(12, 8))
+sns.barplot(x='Importance', y='Feature', data=feature_importance)
+plt.title('特征重要性排名')
+plt.tight_layout()
+plt.savefig('feature_importance.png')
+plt.show()
+
+# 3. 根据特征重要性选择特征
+top_n = 10  # 选择重要性最高的10个特征
+selected_features = feature_importance.head(top_n)['Feature'].tolist()
+print(f"选择的特征: {selected_features}")
+
+'''模型拟合阶段'''
+
 
 
 
