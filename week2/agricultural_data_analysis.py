@@ -1,6 +1,10 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import xgboost as xgb
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.model_selection import GridSearchCV
+
 
 # 设置中文显示
 plt.rcParams["font.family"] = ["SimHei"]
@@ -102,8 +106,33 @@ selected_features = feature_importance.head(top_n)['Feature'].tolist()
 print(f"选择的特征: {selected_features}")
 
 '''模型拟合阶段'''
+# 准备特征数据
+X_train_selected = X_train[selected_features]
+X_test_selected = X_test[selected_features]
 
+# 选择 XGBoost 模型
+model = xgb.XGBRegressor(random_state=42)
 
+# 训练模型
+model.fit(X_train, y_train)
+
+# 在训练集上进行预测
+y_train_pred = model.predict(X_train)
+# 在测试集上进行预测
+y_pred = model.predict(X_test)
+
+# 评估训练集模型
+train_mse = mean_squared_error(y_train, y_train_pred)
+train_r2 = r2_score(y_train, y_train_pred)
+
+# 评估测试集模型
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print(f"训练集均方误差 (MSE): {train_mse}")
+print(f"训练集决定系数 (R²): {train_r2}")
+print(f"测试集均方误差 (MSE): {mse}")
+print(f"测试集决定系数 (R²): {r2}")
 
 
 
