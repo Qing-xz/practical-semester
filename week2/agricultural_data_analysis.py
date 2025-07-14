@@ -1,12 +1,9 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.model_selection import train_test_split
 import xgboost as xgb
 from sklearn.metrics import mean_squared_error, r2_score
-from sklearn.model_selection import GridSearchCV
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.model_selection import train_test_split
-
 
 # 设置中文显示
 plt.rcParams["font.family"] = ["SimHei"]
@@ -64,50 +61,25 @@ df['Average Price'] = (df['Low Price'] + df['High Price']) / 2
 print(df.info())
 
 '''数据分析阶段'''
-# 1. 计算特征相关性热力图
-plt.figure(figsize=(14, 10))
-correlation_matrix = df.corr()
-sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt='.2f')
-plt.title('特征相关性热力图')
-plt.tight_layout()
-plt.savefig('correlation_heatmap.png')
-plt.show()
+selected_columns = ['Year', 'Month', 'City Name', 'Variety', 'Item Size', 'Average Price']
+model_df = df[selected_columns]
 
-# 2. 特征重要性分析
-# 定义特征和目标变量
-X = df.drop(['Average Price', 'Date','Low Price','High Price','Mostly Low','Mostly High'], axis=1)  # 移除目标变量和日期
-y = df['Average Price']
+# 查看筛选后数据的基本信息
+print('用于建模的数据基本信息：')
+model_df.info()
 
-# 划分训练集和测试集
+# 查看各特征与平均价格的相关性（保留两位小数）
+correlation = model_df.corr()['Average Price'].drop('Average Price').round(2)
+print('各特征与平均价格的相关性：')
+print(correlation)
+
+'''数据建模阶段'''
+# 划分特征和目标变量
+X = model_df.drop('Average Price', axis=1)
+y = model_df['Average Price']
+
+# 划分训练集和测试集，80%的数据用于训练，20%用于测试
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# 使用随机森林评估特征重要性
-rf = RandomForestRegressor(n_estimators=100, random_state=42)
-rf.fit(X_train, y_train)
-
-# 获取特征重要性
-feature_importance = pd.DataFrame({
-    'Feature': X.columns,
-    'Importance': rf.feature_importances_
-}).sort_values('Importance', ascending=False)
-
-# 可视化特征重要性
-plt.figure(figsize=(12, 8))
-sns.barplot(x='Importance', y='Feature', data=feature_importance)
-plt.title('特征重要性排名')
-plt.tight_layout()
-plt.savefig('feature_importance.png')
-plt.show()
-
-# 3. 根据特征重要性选择特征
-top_n = 10  # 选择重要性最高的10个特征
-selected_features = feature_importance.head(top_n)['Feature'].tolist()
-print(f"选择的特征: {selected_features}")
-
-'''模型拟合阶段'''
-# 准备特征数据
-X_train_selected = X_train[selected_features]
-X_test_selected = X_test[selected_features]
 
 # 选择 XGBoost 模型
 model = xgb.XGBRegressor(random_state=42)
@@ -120,6 +92,7 @@ y_train_pred = model.predict(X_train)
 # 在测试集上进行预测
 y_pred = model.predict(X_test)
 
+# 评估模型
 # 评估训练集模型
 train_mse = mean_squared_error(y_train, y_train_pred)
 train_r2 = r2_score(y_train, y_train_pred)
@@ -127,12 +100,14 @@ train_r2 = r2_score(y_train, y_train_pred)
 # 评估测试集模型
 mse = mean_squared_error(y_test, y_pred)
 r2 = r2_score(y_test, y_pred)
+print(f"均方误差 (MSE): {mse}")
+print(f"决定系数 (R²): {r2}")
+
 
 print(f"训练集均方误差 (MSE): {train_mse}")
 print(f"训练集决定系数 (R²): {train_r2}")
 print(f"测试集均方误差 (MSE): {mse}")
 print(f"测试集决定系数 (R²): {r2}")
-
 
 '''可视化'''
 # Matplotlib绘图部分
@@ -216,4 +191,3 @@ plt.title('价格和尺寸的关系（Seaborn）')
 plt.xlabel('尺寸（数值编码）')
 plt.ylabel('平均价格')
 plt.savefig('seaborn_price_size_relationship.png', dpi=300, bbox_inches='tight')
-plt.show()
